@@ -1,0 +1,45 @@
+#Iniciando as tarefas
+services:
+  #Nome da tarefa que teremos como funcionalidade o banco de dados
+  db:
+    #Definindo qual imagem do docker irá utilizar
+    image: postgres
+    #Definindo portas
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=123
+      - POSTGRES_USER=agendador
+      - POSTGRES_DB=agendador-usuario
+    #Checando se o container subiu normalmente
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U agendador" ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  #Iniciando a tarefa de build da aplicação para inicialização
+  api:
+    #Informando que o build será feito a aprtir do diretório principal
+    build: .
+    #Informando as portas
+    ports:
+      - "8080:8080"
+    #Informando o comando que para que essa tarefa seja executara é preciso que a tarefa DB esteja concluida e saudavel
+    depends_on:
+      db:
+        condition: service_healthy
+    #Passando as variaveis de ambiente da aplicação que será informada no aplications.properties
+    environment:
+      - DATABASE_URL=jdbc:postgresql://db:5432/agendador-usuario?createDatabaseIfNotExist=true
+      - DATABASE_USER=agendador
+      - DATABASE_PASSWORD=123
+
+#Criando o network
+networks:
+  #Informando o nome do network
+  agendador:
+    #Informando o tipo do network
+    driver: bridge
+
+

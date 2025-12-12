@@ -42,7 +42,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/user/login").permitAll() // Permite acesso ao endpoint de login sem autenticação
                         .requestMatchers(HttpMethod.GET, "/auth").permitAll()// Permite acesso ao endpoint GET /auth sem autenticação
-                        .requestMatchers(HttpMethod.POST, "/user").permitAll() // Permite acesso ao endpoint POST /usuario sem autenticação
+                        .requestMatchers(HttpMethod.POST, "/usuario").permitAll() // Permite acesso ao endpoint POST /usuario sem autenticação
                         .requestMatchers("/user/**").authenticated() // Requer autenticação para qualquer endpoint que comece com /usuario/
                         .anyRequest().authenticated() // Requer autenticação para todas as outras requisições
                 )

@@ -1,6 +1,7 @@
 package com.agendador.usuario.controller.converter;
 
 import com.agendador.usuario.controller.DTO.EnderecoDTO;
+import com.agendador.usuario.controller.DTO.ShowUsuarioDTO;
 import com.agendador.usuario.controller.DTO.TelefoneDTO;
 import com.agendador.usuario.controller.DTO.UsuarioDTO;
 import com.agendador.usuario.infrastructure.entity.Endereco;
@@ -61,11 +62,10 @@ public class UsuarioConverter {
         return telefones;
     }
 
-    public UsuarioDTO paraUsuarioDTO(Usuario usuarioDTO){
-        return UsuarioDTO.builder()
+    public ShowUsuarioDTO paraUsuarioDTO(Usuario usuarioDTO){
+        return ShowUsuarioDTO.builder()
                 .nome(usuarioDTO.getNome())
                 .email(usuarioDTO.getEmail())
-                .senha(usuarioDTO.getSenha())
                 .idade(usuarioDTO.getIdade())
                 .enderecos(paraListaEnderecoDTO(usuarioDTO.getEnderecos()))
                 .telefones(paraListaTelefoneDTO(usuarioDTO.getTelefones()))

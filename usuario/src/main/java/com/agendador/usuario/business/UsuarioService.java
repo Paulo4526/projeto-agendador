@@ -1,16 +1,25 @@
 package com.agendador.usuario.business;
 
+import com.agendador.usuario.controller.DTO.endereco.EnderecoDTO;
+import com.agendador.usuario.controller.DTO.endereco.ShowEnderecoDTO;
+import com.agendador.usuario.controller.DTO.telefone.ShowTelefoneDTO;
+import com.agendador.usuario.controller.DTO.telefone.TelefoneDTO;
 import com.agendador.usuario.controller.DTO.usuario.ShowUsuarioDTO;
 import com.agendador.usuario.controller.DTO.usuario.UsuarioDTO;
 import com.agendador.usuario.controller.converter.UsuarioConverter;
+import com.agendador.usuario.infrastructure.entity.Endereco;
+import com.agendador.usuario.infrastructure.entity.Telefone;
 import com.agendador.usuario.infrastructure.entity.Usuario;
 import com.agendador.usuario.infrastructure.exceptions.ConflictException;
 import com.agendador.usuario.infrastructure.exceptions.ResourceNotFoundException;
+import com.agendador.usuario.infrastructure.repository.EnderecoRepository;
+import com.agendador.usuario.infrastructure.repository.TelefoneRepository;
 import com.agendador.usuario.infrastructure.repository.UsuarioRepository;
 import com.agendador.usuario.infrastructure.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -18,6 +27,8 @@ public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
     private final UsuarioConverter usuarioConverter;
+    private final EnderecoRepository enderecoRepository;
+    private final TelefoneRepository telefoneRepository;
     private final JwtUtil jwtUtil;
 
     public ShowUsuarioDTO salvaUsuario(UsuarioDTO usuarioDTO){
@@ -75,7 +86,38 @@ public class UsuarioService {
         //Passando os valores recebidos pelo usuarioDTO na requisição e os valores recebidos da entity, onde será feito a comparação dentro do metodo updateUsuario
         //Caso o usuario altere qualquer valor sendo senha, email, idade, ou nome será passado um novo valor para entidade antes de ser salvo no bancod e dados
         Usuario usuario = usuarioConverter.updateUsuario(usuarioDTO, usuarioEntity);
-        return new ShowUsuarioDTO(usuario);
+        return new ShowUsuarioDTO(usuarioRepository.save(usuario));
     }
+
+    public ShowEnderecoDTO atualizandoEnderedo(UUID id, EnderecoDTO enderecoDTO){
+        Endereco enderecoEntity = enderecoRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("ID do endereço não encontrado! " + id));
+        Endereco endereco = usuarioConverter.updateEndereco(enderecoDTO, enderecoEntity);
+        return new ShowEnderecoDTO(enderecoRepository.save(endereco));
+    }
+
+    public ShowEnderecoDTO buscaEnderecoById(UUID id){
+        Endereco enderecoEntity = enderecoRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("ID do endereço não encontrado " + id));
+        return new ShowEnderecoDTO(enderecoEntity);
+    }
+
+    public void deleteEnderecoById(UUID id){
+        enderecoRepository.deleteById(id);
+    }
+
+    public ShowTelefoneDTO atualizandoTelefone(UUID id, TelefoneDTO telefoneDTO){
+        Telefone telefoneEntity = telefoneRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("ID do telefone não encontrado " + id));
+        Telefone telefone = usuarioConverter.updateTelefone(telefoneDTO, telefoneEntity);
+        return new ShowTelefoneDTO(telefoneRepository.save(telefone));
+    }
+
+    public ShowTelefoneDTO buscaTelefoneById(UUID id){
+        Telefone telefoneEntity = telefoneRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("ID do telefone não encontrado " + id));
+        return new ShowTelefoneDTO(telefoneEntity);
+    }
+
+    public void deleteTelefoneBydId(UUID id){
+        telefoneRepository.deleteById(id);
+    }
+
 
 }

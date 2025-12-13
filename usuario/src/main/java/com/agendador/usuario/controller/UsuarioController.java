@@ -1,7 +1,11 @@
 package com.agendador.usuario.controller;
 
 import com.agendador.usuario.business.UsuarioService;
+import com.agendador.usuario.controller.DTO.endereco.EnderecoDTO;
+import com.agendador.usuario.controller.DTO.endereco.ShowEnderecoDTO;
 import com.agendador.usuario.controller.DTO.login.LoginDTO;
+import com.agendador.usuario.controller.DTO.telefone.ShowTelefoneDTO;
+import com.agendador.usuario.controller.DTO.telefone.TelefoneDTO;
 import com.agendador.usuario.controller.DTO.usuario.ShowUsuarioDTO;
 import com.agendador.usuario.controller.DTO.login.TokenDTO;
 import com.agendador.usuario.controller.DTO.usuario.UsuarioDTO;
@@ -14,6 +18,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @Controller
 @RequiredArgsConstructor
@@ -52,6 +58,38 @@ public class UsuarioController {
     @PutMapping
     public ResponseEntity<ShowUsuarioDTO> atualizaUsuariov(@RequestHeader("Authorization") String token,@RequestBody UsuarioDTO usuarioDTO){
         return ResponseEntity.ok(usuarioService.atualizaDadosUsuario(token, usuarioDTO));
+    }
+
+    @PutMapping("/endereco")
+    public ResponseEntity<ShowEnderecoDTO> atualizaEndereco(@RequestBody EnderecoDTO enderecoDTO, @RequestParam("enderecoId") UUID id){
+        return ResponseEntity.ok(usuarioService.atualizandoEnderedo(id, enderecoDTO));
+    }
+
+    @GetMapping("/endereco")
+    public ResponseEntity<ShowEnderecoDTO> buscaEnderecoById(@RequestParam("enderecoId") UUID id){
+        return ResponseEntity.ok(usuarioService.buscaEnderecoById(id));
+    }
+
+    @DeleteMapping("/endereco")
+    public ResponseEntity<Void> deleteEnderecoById(@RequestParam("enderecoId") UUID id){
+        usuarioService.deleteEnderecoById(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/telefone")
+    public ResponseEntity<ShowTelefoneDTO> atualizaTelefone(@RequestBody TelefoneDTO telefoneDTO, @RequestParam("telefoneId") UUID id){
+        return ResponseEntity.ok(usuarioService.atualizandoTelefone(id, telefoneDTO));
+    }
+
+    @GetMapping("/telefone")
+    public ResponseEntity<ShowTelefoneDTO> buscaTelefoneById(@RequestParam("telefoneId") UUID id){
+        return ResponseEntity.ok(usuarioService.buscaTelefoneById(id));
+    }
+
+    @DeleteMapping("/telefone")
+    public ResponseEntity<Void> deleteTelefoneById(@RequestParam("telefoneId") UUID id){
+        usuarioService.deleteTelefoneBydId(id);
+        return ResponseEntity.noContent().build();
     }
 
 }

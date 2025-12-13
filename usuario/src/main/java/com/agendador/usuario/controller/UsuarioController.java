@@ -1,10 +1,10 @@
 package com.agendador.usuario.controller;
 
 import com.agendador.usuario.business.UsuarioService;
-import com.agendador.usuario.controller.DTO.LoginDTO;
-import com.agendador.usuario.controller.DTO.ShowUsuarioDTO;
-import com.agendador.usuario.controller.DTO.TokenDTO;
-import com.agendador.usuario.controller.DTO.UsuarioDTO;
+import com.agendador.usuario.controller.DTO.login.LoginDTO;
+import com.agendador.usuario.controller.DTO.usuario.ShowUsuarioDTO;
+import com.agendador.usuario.controller.DTO.login.TokenDTO;
+import com.agendador.usuario.controller.DTO.usuario.UsuarioDTO;
 import com.agendador.usuario.infrastructure.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -47,6 +47,11 @@ public class UsuarioController {
     public ResponseEntity<Void> deleteUserByEmail(@PathVariable String email){
         usuarioService.deleteUserByEmail(email);
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping
+    public ResponseEntity<ShowUsuarioDTO> atualizaUsuariov(@RequestHeader("Authorization") String token,@RequestBody UsuarioDTO usuarioDTO){
+        return ResponseEntity.ok(usuarioService.atualizaDadosUsuario(token, usuarioDTO));
     }
 
 }

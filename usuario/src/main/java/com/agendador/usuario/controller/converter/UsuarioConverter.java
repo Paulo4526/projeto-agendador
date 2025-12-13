@@ -1,26 +1,31 @@
 package com.agendador.usuario.controller.converter;
 
-import com.agendador.usuario.controller.DTO.EnderecoDTO;
-import com.agendador.usuario.controller.DTO.ShowUsuarioDTO;
-import com.agendador.usuario.controller.DTO.TelefoneDTO;
-import com.agendador.usuario.controller.DTO.UsuarioDTO;
+import com.agendador.usuario.controller.DTO.endereco.EnderecoDTO;
+import com.agendador.usuario.controller.DTO.usuario.ShowUsuarioDTO;
+import com.agendador.usuario.controller.DTO.telefone.TelefoneDTO;
+import com.agendador.usuario.controller.DTO.usuario.UsuarioDTO;
 import com.agendador.usuario.infrastructure.entity.Endereco;
 import com.agendador.usuario.infrastructure.entity.Telefone;
 import com.agendador.usuario.infrastructure.entity.Usuario;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
-//OBS: Esta maneira é feita devido não haver as funcionalidades da classe record no java 11, então neste microserviço será feito com metodos converter
+//OBS: Esta maneira é feita devido não haver as funcionalidades da classe record no java 11, então neste microserviço será feito com metodos converter para salvar os dados nas entidades de Usuario e ShowUsuarioDTO
 @Component
+@RequiredArgsConstructor
 public class UsuarioConverter {
+
+    private final PasswordEncoder passwordEncoder;
 
     public Usuario paraUsuario(UsuarioDTO usuarioDTO){
         return Usuario.builder()
                 .nome(usuarioDTO.getNome())
                 .email(usuarioDTO.getEmail())
-                .senha(usuarioDTO.getSenha())
+                .senha(encodePassword(usuarioDTO.getSenha()))
                 .idade(usuarioDTO.getIdade())
                 .enderecos(paraListaEndereco(usuarioDTO.getEnderecos()))
                 .telefones(paraListaTelefone(usuarioDTO.getTelefones()))
@@ -38,7 +43,6 @@ public class UsuarioConverter {
                 .complemento(enderecoDTO.getComplemento())
                 .build();
     }
-
 
     //Iteração com stream().map()
     public List<Endereco> paraListaEndereco(List<EnderecoDTO> enderecoDTO){
@@ -62,48 +66,22 @@ public class UsuarioConverter {
         return telefones;
     }
 
-    public ShowUsuarioDTO paraUsuarioDTO(Usuario usuarioDTO){
-        return ShowUsuarioDTO.builder()
-                .nome(usuarioDTO.getNome())
-                .email(usuarioDTO.getEmail())
-                .idade(usuarioDTO.getIdade())
-                .enderecos(paraListaEnderecoDTO(usuarioDTO.getEnderecos()))
-                .telefones(paraListaTelefoneDTO(usuarioDTO.getTelefones()))
+    public Usuario updateUsuario(UsuarioDTO usuarioDTO, Usuario entity){
+        return Usuario.builder()
+                .id(entity.getId())
+                .nome(usuarioDTO.getNome() != null ? usuarioDTO.getNome() : entity.getNome())
+                .senha(usuarioDTO.getSenha() != null ? encodePassword(usuarioDTO.getSenha()) : entity.getSenha())
+                .email(usuarioDTO.getEmail() != null ? usuarioDTO.getEmail() : entity.getEmail())
+                .idade(usuarioDTO.getIdade() != null ? usuarioDTO.getIdade() : entity.getIdade())
+                .enderecos(entity.getEnderecos())
+                .telefones(entity.getTelefones())
                 .build();
+
     }
 
-    public EnderecoDTO paraEnderecoDTO(Endereco enderecoDTO){
-        return EnderecoDTO.builder()
-                .rua(enderecoDTO.getRua())
-                .bairro(enderecoDTO.getBairro())
-                .cidade(enderecoDTO.getCidade())
-                .estado(enderecoDTO.getEstado())
-                .cep(enderecoDTO.getCep())
-                .numero(enderecoDTO.getNumero())
-                .complemento(enderecoDTO.getComplemento())
-                .build();
+    //Metodo que escriptara o password
+    public String encodePassword(String password){
+        return passwordEncoder.encode(password);
     }
 
-
-    //Iteração com stream().map()
-    public List<EnderecoDTO> paraListaEnderecoDTO(List<Endereco> enderecoDTO){
-        return enderecoDTO.stream().map(this::paraEnderecoDTO).toList();
-    }
-
-    public TelefoneDTO paraTelefone(Telefone telefoneDTO){
-        return TelefoneDTO.builder()
-                .ddd(telefoneDTO.getDdd())
-                .numero(telefoneDTO.getNumero())
-                .build();
-    }
-
-    //Iteração em metodo for
-    public List<TelefoneDTO> paraListaTelefoneDTO(List<Telefone> telefoneDTOS){
-        List<TelefoneDTO> telefones = new ArrayList<>();
-        for(Telefone telefoneDTO : telefoneDTOS){
-            telefones.add(paraTelefone(telefoneDTO));
-        }
-
-        return telefones;
-    }
 }

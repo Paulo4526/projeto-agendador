@@ -1,4 +1,4 @@
-package com.agendador.usuario.controller.DTO;
+package com.agendador.usuario.controller.DTO.login;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,6 +1,5 @@
-package com.agendador.usuario.controller.DTO;
+package com.agendador.usuario.controller.DTO.endereco;
 
-import jakarta.persistence.Column;
 import lombok.*;
 
 @Getter

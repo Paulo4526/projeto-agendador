@@ -1,5 +1,7 @@
-package com.agendador.usuario.controller.DTO;
+package com.agendador.usuario.controller.DTO.usuario;
 
+import com.agendador.usuario.controller.DTO.endereco.EnderecoDTO;
+import com.agendador.usuario.controller.DTO.telefone.TelefoneDTO;
 import lombok.*;
 
 import java.util.List;
@@ -9,15 +11,13 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ShowUsuarioDTO {
+public class UsuarioDTO {
+
     private String nome;
     private String email;
+    private String senha;
     private Integer idade;
     private List<EnderecoDTO> enderecos;
     private List<TelefoneDTO> telefones;
-
-    public ShowUsuarioDTO(UsuarioDTO usuarioDTO){
-        this(usuarioDTO.getNome(), usuarioDTO.getEmail(), usuarioDTO.getIdade(), usuarioDTO.getEnderecos(), usuarioDTO.getTelefones());
-    }
 
 }

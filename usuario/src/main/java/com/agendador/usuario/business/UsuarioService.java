@@ -1,14 +1,15 @@
 package com.agendador.usuario.business;
 
-import com.agendador.usuario.controller.DTO.ShowUsuarioDTO;
-import com.agendador.usuario.controller.DTO.UsuarioDTO;
+import com.agendador.usuario.controller.DTO.usuario.ShowUsuarioDTO;
+import com.agendador.usuario.controller.DTO.usuario.UsuarioDTO;
 import com.agendador.usuario.controller.converter.UsuarioConverter;
 import com.agendador.usuario.infrastructure.entity.Usuario;
 import com.agendador.usuario.infrastructure.exceptions.ConflictException;
 import com.agendador.usuario.infrastructure.exceptions.ResourceNotFoundException;
 import com.agendador.usuario.infrastructure.repository.UsuarioRepository;
+import com.agendador.usuario.infrastructure.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -17,20 +18,18 @@ public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
     private final UsuarioConverter usuarioConverter;
-    private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
     public ShowUsuarioDTO salvaUsuario(UsuarioDTO usuarioDTO){
         try{
-            //Verifica se o e-maile xiste
+            //Verifica se o e-mail existe
             emailExiste(usuarioDTO.getEmail());
-            //Encrypta o password recebido
-            usuarioDTO.setSenha(passwordEncoder.encode(usuarioDTO.getSenha()));
             //Recebe os valores do usuário DTO e copia para a entidade Usuário
             Usuario usuario = usuarioConverter.paraUsuario(usuarioDTO);
             //Salva os dados recebidos pela entidade DTO no banco de dados
             usuario = usuarioRepository.save(usuario);
             //Retorna o ShowUsuarioDTO onde não mostrará a senha do usuário
-            return usuarioConverter.paraUsuarioDTO(usuario);
+            return new ShowUsuarioDTO(usuario);
 
         }catch(ConflictException e){
             throw new ConflictException("Email já existente: " + e.getCause());
@@ -45,7 +44,9 @@ public class UsuarioService {
     //Funcionalidade que chama o metodo verificaEmail e faz os tratamentos necessários
     public void emailExiste(String email){
         try {
+            //Verifica se o e-mail já existe
             boolean existe = verificaEmailExiste(email);
+            //Condicional que verifica, caso e-mail exista gerará uma Exception de conflito personalizada. Caso de erro entratrá no catch se não seguira normalmente.
             if (existe){
                 throw new ConflictException("Email já cadastrado!");
             }
@@ -54,12 +55,27 @@ public class UsuarioService {
         }
     }
 
+    //Metodo que deleta o usuário pelo e-mail também podemos utilizar pelo id.
     public void deleteUserByEmail(String email){
         usuarioRepository.deleteByEmail(email);
     }
 
+    //Metodo que procura os dados do usuário pelo e-mail, também é possivel procurar pelo id.
+    //OBS: As opções de busca são personalizadas de acordo com a necessidade e regra de negócio, podendo ser buscado por identificadores unicos como e-mail, cpf, rg, id e etc.
     public ShowUsuarioDTO findUserByEmail(String email){
-        return usuarioConverter.paraUsuarioDTO(usuarioRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("Email de usuário não encontrado!")));
+        return new ShowUsuarioDTO(usuarioRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("Email de usuário não encontrado!")));
+    }
+
+    //Metodo que atualiza os dados do usuário.
+    public ShowUsuarioDTO atualizaDadosUsuario(String token, UsuarioDTO usuarioDTO){
+        //Variavel que receberá o e-mail do metodo extractUserName, onde será passado o token e será extraido o email.
+        String email = jwtUtil.extractUsername(token.substring(7));
+        //Construtor que recebe os dados do usuário após a busca por e-mail no banco de dados pelo metodo findByEmail no repository
+        Usuario usuarioEntity = usuarioRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("Email não localizado!"));
+        //Passando os valores recebidos pelo usuarioDTO na requisição e os valores recebidos da entity, onde será feito a comparação dentro do metodo updateUsuario
+        //Caso o usuario altere qualquer valor sendo senha, email, idade, ou nome será passado um novo valor para entidade antes de ser salvo no bancod e dados
+        Usuario usuario = usuarioConverter.updateUsuario(usuarioDTO, usuarioEntity);
+        return new ShowUsuarioDTO(usuario);
     }
 
 }

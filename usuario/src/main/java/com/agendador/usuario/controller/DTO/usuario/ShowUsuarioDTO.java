@@ -22,6 +22,7 @@ public class ShowUsuarioDTO {
     private UUID id;
     private String nome;
     private String email;
+    private String senha;
     private Integer idade;
     private List<ShowEnderecoDTO> enderecos;
     private List<ShowTelefoneDTO> telefones;
@@ -31,9 +32,20 @@ public class ShowUsuarioDTO {
                 usuario.getId(),
                 usuario.getNome(),
                 usuario.getEmail(),
+                usuario.getSenha(),
                 usuario.getIdade(),
-                usuario.getEnderecos().stream().map(ShowEnderecoDTO::new).toList(),
-                usuario.getTelefones().stream().map(ShowTelefoneDTO::new).toList()
+                usuario.getEnderecos() == null
+                        ? List.of()
+                        : usuario.getEnderecos()
+                        .stream()
+                        .map(ShowEnderecoDTO::new)
+                        .toList(),
+                usuario.getTelefones() == null
+                        ? List.of()
+                        : usuario.getTelefones()
+                        .stream()
+                        .map(ShowTelefoneDTO::new)
+                        .toList()
         );
     }
 }

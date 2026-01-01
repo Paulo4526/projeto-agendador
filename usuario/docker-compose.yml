@@ -3,20 +3,26 @@ services:
   #Nome da tarefa que teremos como funcionalidade o banco de dados
   db:
     #Definindo qual imagem do docker irá utilizar
-    image: postgres
+    image: postgres:16
     #Definindo portas
     ports:
       - "5432:5432"
     environment:
       - POSTGRES_PASSWORD=123
       - POSTGRES_USER=agendador
-      - POSTGRES_DB=agendador-usuario
+      - POSTGRES_DB=agendador_usuario
+
+    #Informando o volume onde será salvo os dados
+    volumes:
+      - "D:/Javanauta/volumes/postgres_agendador:/var/lib/postgresql/data"
     #Checando se o container subiu normalmente
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U agendador" ]
+      test: [ "CMD-SHELL", "pg_isready -U agendador -d agendador_usuario" ]
       interval: 5s
       timeout: 3s
       retries: 5
+    networks:
+      - agendador
 
   #Iniciando a tarefa de build da aplicação para inicialização
   api:
@@ -31,9 +37,11 @@ services:
         condition: service_healthy
     #Passando as variaveis de ambiente da aplicação que será informada no aplications.properties
     environment:
-      - DATABASE_URL=jdbc:postgresql://db:5432/agendador-usuario?createDatabaseIfNotExist=true
+      - DATABASE_URL=jdbc:postgresql://db:5432/agendador_usuario
       - DATABASE_USER=agendador
       - DATABASE_PASSWORD=123
+    networks:
+      - agendador
 
 #Criando o network
 networks:
@@ -41,5 +49,3 @@ networks:
   agendador:
     #Informando o tipo do network
     driver: bridge
-
-

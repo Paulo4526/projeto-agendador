@@ -25,3 +25,15 @@ WORKDIR /opt/app
 EXPOSE 8080
 #Comando de entrada para inicio da aplicação
 ENTRYPOINT ["java", "-jar", "app.jar"]
+
+#Comando para criar a imagem docker: docker build -t nome-do-projeto .
+#Comando para criar o contaniner a partir de uma imagem no projeto docker: docker run -dti -p 8080:8080 --name bff-projeto-agendador nome-do-projeto
+#Explicação de comandos:
+#docker run -> comando que cria o container a partir da imagem
+#-dti -> comando para que ele tenha diretiva, e iteração
+# -p 8086:8080 -> a porta 8080 do container será exposta para fora como porta 8080
+# nome-do-projeto -> nome da imagem criada no primeiro comando onde será utilizada como base para criação do nosso container
+
+#Parametros adicionais:
+# --name -> parametro para setar o nome do container a ser criado
+# -e -> parametro para indicar uma variavel de ambiente caso setada

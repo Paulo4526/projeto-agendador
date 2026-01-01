@@ -36,11 +36,11 @@ public class Usuario implements UserDetails {
     //Tipo de Relacionamento um para muitos
     @OneToMany(cascade = CascadeType.ALL)
     //Criando o relacionamento entre as tabelas
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = true)
     private List<Endereco> enderecos;
 
     @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = true)
     private List<Telefone> telefones;
 
     //Secutiry Metodo obrigatorio 1

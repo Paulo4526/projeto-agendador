@@ -28,8 +28,8 @@ public class UsuarioConverter {
                 .email(usuarioDTO.getEmail())
                 .senha(encodePassword(usuarioDTO.getSenha()))
                 .idade(usuarioDTO.getIdade())
-                .enderecos(paraListaEndereco(usuarioDTO.getEnderecos()))
-                .telefones(paraListaTelefone(usuarioDTO.getTelefones()))
+                .enderecos(usuarioDTO.getEnderecos() != null ? paraListaEndereco(usuarioDTO.getEnderecos()) : null)
+                .telefones(usuarioDTO.getTelefones() != null ? paraListaTelefone(usuarioDTO.getTelefones()) : null)
                 .build();
     }
 
